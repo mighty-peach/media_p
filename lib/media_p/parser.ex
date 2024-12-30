@@ -9,14 +9,11 @@ defmodule MediaP.Parser do
   Returns `[flag: value]`
   """
   def parse(url) do
-    flags =
-      url
-      |> get_flags()
-      |> filter_flags()
-      |> transform_flags()
-      |> Enum.reverse()
-
-    IO.inspect(flags)
+    url
+    |> get_flags()
+    |> filter_flags()
+    |> transform_flags()
+    |> Enum.reverse()
   end
 
   defp get_flags(url) do
@@ -50,7 +47,6 @@ defmodule MediaP.Parser do
   end
 
   defp get_flag("w", [head | tail], result) do
-    # FIXME: to_imagemagick(head)
     result = [{:w, String.to_integer(elem(head, 1))} | result]
     next = get_next_flag(tail)
 
@@ -58,7 +54,6 @@ defmodule MediaP.Parser do
   end
 
   defp get_flag("h", [head | tail], result) do
-    # FIXME: to_imagemagick(head)
     result = [{:h, String.to_integer(elem(head, 1))} | result]
     next = get_next_flag(tail)
 
