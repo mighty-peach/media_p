@@ -1,18 +1,7 @@
 defmodule MediaP do
-  @moduledoc """
-  Documentation for `MediaP`.
-  """
+  use Application
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> MediaP.hello()
-      :world
-
-  """
-  def hello do
-    :world
+  def start(_start_type, _start_args) do
+    {:ok, self()}
   end
 end
