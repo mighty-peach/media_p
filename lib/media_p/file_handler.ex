@@ -43,7 +43,7 @@ defmodule MediaP.FileHandler do
   @doc """
   Returns media by given transformed path
   """
-  def get_transformed(flags, file_path) do
+  def get_transformed(flags, file_path, mode) do
     flags_path = map_flags_to_path(flags)
     path = "#{@transformed_path}/#{flags_path}/#{file_path}"
 
@@ -52,8 +52,17 @@ defmodule MediaP.FileHandler do
         {:ok, Image.open!(path), path}
 
       false ->
-        download_transformed(flags, file_path)
+        transformation_pipeline(flags, file_path, mode)
     end
+  end
+
+  def transformation_pipeline(flags, file_path, :proxy) do
+    download_transformed(flags, file_path)
+  end
+
+  def transformation_pipeline(flags, file_path, :in_place) do
+    # TODO: make transformation in place
+    download_transformed(flags, file_path)
   end
 
   @doc """
