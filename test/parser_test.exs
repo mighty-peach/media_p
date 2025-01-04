@@ -1,4 +1,4 @@
-defmodule MediaPTest do
+defmodule MediaP.ParserTest do
   alias MediaP.Parser
   use ExUnit.Case
 
