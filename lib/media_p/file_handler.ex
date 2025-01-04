@@ -63,7 +63,7 @@ defmodule MediaP.FileHandler do
     flags_path = map_flags_to_path(flags)
     dir_path = "#{@transformed_path}/#{flags_path}/"
 
-    url = "https://#{@origin}/#{Enum.join(",")}/#{url}"
+    url = "https://#{@origin}/#{Enum.join(flags, ",")}/#{url}"
     {:ok, response} = Req.get(url, @options)
 
     file_name = url |> String.split("/") |> List.last()
