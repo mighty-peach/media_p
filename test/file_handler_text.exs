@@ -70,7 +70,7 @@ defmodule MediaP.FileHandlerTest do
     {:ok, file} = File.read("#{@path}/assets/test/step-1-image.jpg")
 
     Req.Test.stub(MediaP.FileHandler, fn conn ->
-      assert conn.request_path == "/w_10/h_10/test.jpg"
+      assert conn.request_path == "/w_10,h_10/test.jpg"
       Req.Test.html(conn, file)
     end)
 

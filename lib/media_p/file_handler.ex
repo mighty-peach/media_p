@@ -52,17 +52,18 @@ defmodule MediaP.FileHandler do
         {:ok, Image.open!(path), path}
 
       false ->
-        download_transformed(flags_path, file_path)
+        download_transformed(flags, file_path)
     end
   end
 
   @doc """
   Downloads transformed media and writes it to the file system according to the flags
   """
-  def download_transformed(flags_path, url) do
+  def download_transformed(flags, url) do
+    flags_path = map_flags_to_path(flags)
     dir_path = "#{@transformed_path}/#{flags_path}/"
 
-    url = "https://#{@origin}/#{flags_path}/#{url}"
+    url = "https://#{@origin}/#{Enum.join(",")}/#{url}"
     {:ok, response} = Req.get(url, @options)
 
     file_name = url |> String.split("/") |> List.last()
