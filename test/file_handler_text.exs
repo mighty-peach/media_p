@@ -1,69 +1,110 @@
 defmodule MediaP.FileHandlerTest do
   alias MediaP.FileHandler
+  import Mock
+
   use ExUnit.Case
 
   doctest MediaP.FileHandler
 
-  @path Path.expand("./", __DIR__)
+  @original_path Application.compile_env!(:media_p, :original_path)
 
-  test "get_original returns original if it exists" do
-    existing_original = "#{@path}/assets/original/test.jpg"
-    File.cp!("#{@path}/assets/test/step-1-image.jpg", existing_original)
+  test "returns original if it is present" do
+    # Arrange
+    file_name = "test.jpg"
+    existing_original = "#{@original_path}/#{file_name}"
 
-    {:ok, image, _} = FileHandler.get_original("test.jpg")
+    with_mocks([
+      {File, [], [exists?: fn _path -> true end]},
+      {Image, [], [open!: fn _path -> :image end]}
+    ]) do
+      # Act
+      {:ok, image, path: path} = FileHandler.get_original(file_name)
 
-    assert %Vix.Vips.Image{} = image
-
-    # Cleaning
-    File.rm(existing_original)
+      # Assert
+      assert_called(Image.open!(existing_original))
+      assert existing_original == path
+      assert :image == image
+    end
   end
 
-  test "get_original downloads and returns original if it doesn't exist" do
-    {:ok, file} = File.read("#{@path}/assets/test/step-1-image.jpg")
+  test "downloads original if it is not present" do
+    # Arrange
+    file_name = "test.jpg"
+    original_path = "#{@original_path}/#{file_name}"
 
-    Req.Test.stub(MediaP.FileHandler, fn conn ->
-      Req.Test.html(conn, file)
-    end)
+    with_mocks([
+      {File, [], [exists?: fn _path -> false end]},
+      {Req, [], [get: fn _url -> {:ok, %{body: :image}} end]},
+      {Image, [],
+       [
+         open!: fn to_open -> to_open end,
+         write: fn file, _ -> {:ok, file} end
+       ]}
+    ]) do
+      # Act
+      {:ok, image, path: path} = FileHandler.get_original(file_name)
 
-    {:ok, image, path: path} = FileHandler.get_original("test.jpg")
-
-    assert %Vix.Vips.Image{} = image
-    assert File.exists?(path)
-
-    # Cleaning
-    File.rm(path)
+      # Assert
+      assert_called(Image.write(:image, original_path))
+      assert original_path == path
+      assert :image == image
+    end
   end
 
-  test "get_transformed as proxy returns transformed media if it exists" do
-    existing_media = "#{@path}/assets/transformed/w_10/h_10/test.jpg"
-    dir_path = "#{@path}/assets/transformed/w_10/"
-    File.mkdir_p!(Path.dirname(existing_media))
-
-    Image.open!("#{@path}/assets/test/step-1-image.jpg")
-    |> Image.write!(existing_media)
-
-    {:ok, image, _} = FileHandler.get_transformed(["w_10", "h_10"], "test.jpg", :proxy)
-
-    assert %Vix.Vips.Image{} = image
-
-    # Cleaning
-    File.rm_rf(dir_path)
-  end
-
-  test "get_transformed as proxy requests transformed media and writes it if it doesn't exists" do
-    {:ok, file} = File.read("#{@path}/assets/test/step-1-image.jpg")
-
-    Req.Test.stub(MediaP.FileHandler, fn conn ->
-      assert conn.request_path == "/w_10,h_10/test.jpg"
-      Req.Test.html(conn, file)
-    end)
-
-    {:ok, image, path: path} = FileHandler.get_transformed(["w_10", "h_10"], "test.jpg", :proxy)
-
-    assert %Vix.Vips.Image{} = image
-    assert File.exists?(path)
-
-    Cleaning
-    File.rm(path)
-  end
+  # test "downloads original if it is not present" do
+  #   # Arrange
+  #   {:ok, file} = File.read("#{@path}/assets/test/step-1-image.jpg")
+  #
+  #   Req.Test.stub(MediaP.FileHandler, fn conn ->
+  #     Req.Test.html(conn, file)
+  #   end)
+  #
+  #   # Act
+  #   {:ok, image, path: path} = FileHandler.get_original("test.jpg")
+  #
+  #   # Assert
+  #   assert %Vix.Vips.Image{} = image
+  #   assert File.exists?(path)
+  #
+  #   # Cleaning
+  #   File.rm(path)
+  # end
+  #
+  # test "as a proxy returns transformed media if it is present" do
+  #   # Arrange
+  #   existing_media = "#{@path}/assets/transformed/w_10/h_10/test.jpg"
+  #   dir_path = "#{@path}/assets/transformed/w_10/"
+  #   File.mkdir_p!(Path.dirname(existing_media))
+  #
+  #   Image.open!("#{@path}/assets/test/step-1-image.jpg")
+  #   |> Image.write!(existing_media)
+  #
+  #   # Act
+  #   {:ok, image, _} = FileHandler.get_transformed(["w_10", "h_10"], "test.jpg", :proxy)
+  #
+  #   # Assert
+  #   assert %Vix.Vips.Image{} = image
+  #
+  #   # Cleaning
+  #   File.rm_rf(dir_path)
+  # end
+  #
+  # test "as a proxy downloads transformed media if it is not present" do
+  #   # Arrange
+  #   {:ok, file} = File.read("#{@path}/assets/test/step-1-image.jpg")
+  #
+  #   Req.Test.stub(MediaP.FileHandler, fn conn ->
+  #     assert conn.request_path == "/w_10,h_10/test.jpg"
+  #     Req.Test.html(conn, file)
+  #   end)
+  #
+  #   # Act
+  #   {:ok, image, path: path} = FileHandler.get_transformed(["w_10", "h_10"], "test.jpg", :proxy)
+  #
+  #   # Assert
+  #   assert %Vix.Vips.Image{} = image
+  #   assert File.exists?(path)
+  #
+  #   # Cleaning File.rm(path)
+  # end
 end

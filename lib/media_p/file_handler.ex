@@ -4,7 +4,6 @@ defmodule MediaP.FileHandler do
   """
 
   @original_path Application.compile_env!(:media_p, :original_path)
-  @options Application.compile_env!(:media_p, :req_options)
   @origin Application.compile_env!(:media_p, :origin)
   @transformed_path Application.compile_env!(:media_p, :transformed_path)
 
@@ -16,7 +15,7 @@ defmodule MediaP.FileHandler do
 
     case File.exists?(path) do
       true ->
-        {:ok, Image.open!(path), path}
+        {:ok, Image.open!(path), path: path}
 
       false ->
         download_original(file_path)
@@ -28,7 +27,7 @@ defmodule MediaP.FileHandler do
   """
   def download_original(url) do
     url = "https://#{@origin}/#{url}"
-    {:ok, response} = Req.get(url, @options)
+    {:ok, response} = Req.get(url)
 
     file_name = url |> String.split("/") |> List.last()
     save_path = "#{@original_path}/#{file_name}"
@@ -73,7 +72,7 @@ defmodule MediaP.FileHandler do
     dir_path = "#{@transformed_path}/#{flags_path}/"
 
     url = "https://#{@origin}/#{Enum.join(flags, ",")}/#{url}"
-    {:ok, response} = Req.get(url, @options)
+    {:ok, response} = Req.get(url)
 
     file_name = url |> String.split("/") |> List.last()
 
