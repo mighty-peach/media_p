@@ -1,6 +1,6 @@
 defmodule MediaP.FileHandler do
   @moduledoc """
-  Helps working with media
+  Helps working with media files
   """
 
   @original_path Application.compile_env!(:media_p, :original_path)

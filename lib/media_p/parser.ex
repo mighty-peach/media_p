@@ -4,7 +4,7 @@ defmodule MediaP.Parser do
   """
 
   @doc """
-  Returns map with tranformation flags
+  Returns map with tranformation, filtered and sorted alphabetically flags
 
   Returns `[flag: value]`
   """
@@ -13,7 +13,7 @@ defmodule MediaP.Parser do
     |> get_flags()
     |> filter_flags()
     |> transform_flags()
-    |> Enum.reverse()
+    |> Enum.sort(:desc)
   end
 
   defp get_flags(url) do
