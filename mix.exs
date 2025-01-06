@@ -24,7 +24,7 @@ defmodule MediaP.MixProject do
       {:req, "~> 0.5.0"},
       {:vix, "~> 0.31.1"},
       {:image, "~> 0.55.2"},
-      {:mock, "~> 0.3.0", only: :test}
+      {:plug, "~> 1.0", only: :test}
     ]
   end
 end

@@ -7,4 +7,7 @@ config :media_p,
   original_path: "#{path}/assets/original",
   test_path: "#{path}/assets/test",
   origin: "media.com",
-  known_flags: ["w", "h"]
+  known_flags: ["w", "h"],
+  req_options: [
+    plug: {Req.Test, MediaP.FileHandler}
+  ]
