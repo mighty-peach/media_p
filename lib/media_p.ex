@@ -1,11 +1,15 @@
 defmodule MediaP do
   use Application
+  require Logger
 
+  @impl true
   def start(_start_type, _start_args) do
-    # TODO: start server
-    # TODO: run in proxy pipeline
-    # TODO: add in place transformations
-    # TODO: run in place pipeline
-    {:ok, self()}
+    children = [
+      {Bandit, plug: MediaP.Server, port: Application.get_env(:media_p, :port)}
+    ]
+
+    opts = [strategy: :one_for_one, name: MediaP.Supervisor]
+
+    Supervisor.start_link(children, opts)
   end
 end

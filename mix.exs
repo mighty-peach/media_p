@@ -14,7 +14,9 @@ defmodule MediaP.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger],
+      mod: {MediaP, []},
+      env: [port: 4000]
     ]
   end
 
@@ -24,7 +26,8 @@ defmodule MediaP.MixProject do
       {:req, "~> 0.5.0"},
       {:vix, "~> 0.31.1"},
       {:image, "~> 0.55.2"},
-      {:plug, "~> 1.0", only: :test}
+      {:plug, "~> 1.0"},
+      {:bandit, "~> 1.0"}
     ]
   end
 end

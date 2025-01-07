@@ -15,12 +15,6 @@ defmodule MediaP.FileHandlerTest do
     File.rm_rf(@transformed_storage_path)
   end
 
-  setup_all state do
-    state = state |> Map.put(:test_image_opened, Image.open!(@test_image))
-
-    {:ok, state}
-  end
-
   setup do
     File.mkdir_p!(@original_storage_path)
     File.mkdir_p!(@transformed_storage_path)
@@ -28,21 +22,20 @@ defmodule MediaP.FileHandlerTest do
     on_exit(&clean/0)
   end
 
-  test "returns original if it is present", %{test_image_opened: test_image_opened} do
+  test "returns original if it is present" do
     # Arrange
     file_name = "test.jpg"
     original_file_path = "#{@original_storage_path}/#{file_name}"
     File.cp!(@test_image, original_file_path)
 
     # Act
-    {:ok, image, path: path} = FileHandler.get_original(file_name)
+    {:ok, path: path} = FileHandler.get_original(file_name)
 
     # Assert
     assert ^original_file_path = path
-    assert {:ok, +0.0, _} = Image.compare(test_image_opened, image)
   end
 
-  test "downloads original if it is not present", %{test_image_opened: test_image_opened} do
+  test "downloads original if it is not present" do
     # Arrange
     file_name = "test.jpg"
     file = File.read!(@test_image)
@@ -52,16 +45,13 @@ defmodule MediaP.FileHandlerTest do
     end)
 
     # Act
-    {:ok, image, path: path} = FileHandler.get_original(file_name)
+    {:ok, path: path} = FileHandler.get_original(file_name)
 
     # Assert
     assert File.exists?(path)
-    assert {:ok, +0.0, _} = Image.compare(test_image_opened, image)
   end
 
-  test "as a proxy returns transformed media if it is present", %{
-    test_image_opened: test_image_opened
-  } do
+  test "as a proxy returns transformed media if it is present" do
     # Arrange
     file_name = "test.jpg"
     transformed_file_path = "#{@transformed_storage_path}/w_10/h_10/#{file_name}"
@@ -69,16 +59,13 @@ defmodule MediaP.FileHandlerTest do
     File.cp!(@test_image, transformed_file_path)
 
     # Act
-    {:ok, image, path: path} = FileHandler.get_transformed(["w_10", "h_10"], file_name, :proxy)
+    {:ok, path: path} = FileHandler.get_transformed(["w_10", "h_10"], file_name, :proxy)
 
     # Assert
     assert ^transformed_file_path = path
-    assert {:ok, +0.0, _} = Image.compare(test_image_opened, image)
   end
 
-  test "as a proxy downloads transformed media if it is not present", %{
-    test_image_opened: test_image_opened
-  } do
+  test "as a proxy downloads transformed media if it is not present" do
     # Arrange
     file_name = "test.jpg"
     file = File.read!(@test_image)
@@ -89,10 +76,9 @@ defmodule MediaP.FileHandlerTest do
     end)
 
     # Act
-    {:ok, image, path: path} = FileHandler.get_transformed(["w_10", "h_10"], file_name, :proxy)
+    {:ok, path: path} = FileHandler.get_transformed(["w_10", "h_10"], file_name, :proxy)
 
     # Assert
-    assert {:ok, +0.0, _} = Image.compare(test_image_opened, image)
     assert File.exists?(path)
   end
 end
