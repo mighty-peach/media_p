@@ -5,6 +5,7 @@ defmodule MediaP.Server do
   alias MediaP.Parser
 
   # TODO: add a way to define parts of url before flags
+  # TODO: think about extenstions
 
   require Logger
 

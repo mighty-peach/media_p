@@ -2,6 +2,8 @@ defmodule MediaP.Parser do
   @moduledoc """
   Helps working with media url
   """
+  @path_before_flags Application.compile_env!(:media_p, :path_before_flags)
+  @known_flags Application.compile_env!(:media_p, :known_flags)
 
   @doc """
   Returns map with tranformation, filtered and sorted alphabetically flags
@@ -17,11 +19,15 @@ defmodule MediaP.Parser do
   end
 
   defp get_flags(url) do
-    origin = Application.fetch_env!(:media_p, :origin)
+    url =
+      if String.length(@path_before_flags) > 0 and
+           String.starts_with?(url, "/#{@path_before_flags}") do
+        String.replace(url, "/#{@path_before_flags}", "")
+      else
+        url
+      end
 
     url
-    |> String.replace(~r/^https?:\/\//, "")
-    |> String.replace(origin, "")
     |> String.split("/")
     |> Enum.at(1)
     |> String.split(",")
@@ -31,10 +37,8 @@ defmodule MediaP.Parser do
   end
 
   defp filter_flags(flags) do
-    known = Application.fetch_env!(:media_p, :known_flags)
-
     Enum.filter(flags, fn flag ->
-      not is_nil(Enum.find(known, nil, fn x -> elem(flag, 0) == x end))
+      not is_nil(Enum.find(@known_flags, nil, fn x -> elem(flag, 0) == x end))
     end)
   end
 

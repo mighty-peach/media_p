@@ -4,11 +4,11 @@ defmodule MediaP.ParserTest do
 
   doctest MediaP.Parser
 
-  @origin Application.compile_env!(:media_p, :origin)
+  @path_before_flags Application.compile_env!(:media_p, :path_before_flags)
 
   test "converts flags in url into list of only known flags" do
     # Arrange
-    test_url = "#{@origin}/w_10,h_20,unknown_123/123.jpg"
+    test_url = "#{@path_before_flags}/w_10,h_20,unknown_321/123.jpg"
 
     # Act
     result = Parser.parse(test_url)
@@ -19,7 +19,7 @@ defmodule MediaP.ParserTest do
 
   test "does nothing if there are no flags in the url" do
     # Arrange
-    test_url = "#{@origin}/123.jpg"
+    test_url = "#{@path_before_flags}/123.jpg"
 
     # Act
     result = Parser.parse(test_url)

@@ -2,7 +2,6 @@ defmodule MediaP.FileHandler do
   @moduledoc """
   Helps working with media files
   """
-  require Logger
 
   @original_path Application.compile_env!(:media_p, :original_path)
   @origin Application.compile_env!(:media_p, :origin)
@@ -18,11 +17,9 @@ defmodule MediaP.FileHandler do
 
     case File.exists?(path) do
       true ->
-        Logger.info("Image exists: #{path}")
         {:ok, path: path}
 
       false ->
-        Logger.info("Image doesn't exists: #{path}")
         download_original(file_path)
     end
   end
@@ -73,7 +70,7 @@ defmodule MediaP.FileHandler do
     flags_path = map_flags_to_path(flags)
     dir_path = "#{@transformed_path}/#{flags_path}/"
 
-    url = "https://#{@origin}/#{Enum.join(flags, ",")}/#{url}"
+    url = "https://#{@origin}#{url}"
     {:ok, response} = Req.get(url, @options)
 
     file_name = url |> String.split("/") |> List.last()
@@ -88,5 +85,8 @@ defmodule MediaP.FileHandler do
     {:ok, path: save_path}
   end
 
-  defp map_flags_to_path(flags), do: Enum.join(flags, "/")
+  defp flags_to_string(flags), do: flags |> Enum.map(fn x -> "#{elem(x, 0)}_#{elem(x, 1)}" end)
+
+  defp map_flags_to_path(flags),
+    do: flags |> flags_to_string |> Enum.join("/")
 end
