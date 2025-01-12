@@ -1,13 +1,14 @@
 defmodule MediaP.Server do
   import Plug.Conn
 
-  alias MediaP.FileHandler
-  alias MediaP.Parser
+  alias MediaP.Media
+  alias MediaP.MediaPipeline
 
-  # TODO: add a way to define parts of url before flags
-  # TODO: think about extenstions
+  @mode Application.compile_env!(:media_p, :mode)
 
-  require Logger
+  # TODO: add :in_place mode
+  # TODO: Flags -> add procedures to work with flags values
+  # TODO: Flags -> b flags contains additional _, so flags pipeline will broke, need to go through all the tuple elements and join them with _
 
   def init(options) do
     options
@@ -16,20 +17,10 @@ defmodule MediaP.Server do
   def call(conn, _opts) do
     request_path = conn.request_path
 
-    extension =
-      conn.path_info
-      |> List.last()
-      |> String.split(".")
-      |> List.last()
-
-    {:ok, path: path} =
-      case Parser.parse(request_path) do
-        [] -> FileHandler.get_original(request_path)
-        flags -> FileHandler.get_transformed(flags, request_path, :proxy)
-      end
+    media = %Media{} = MediaPipeline.handle(request_path, @mode)
 
     conn
-    |> put_resp_content_type("image/#{extension}")
-    |> send_file(200, path)
+    |> put_resp_content_type("#{media.type}/#{media.extension}")
+    |> send_file(200, media.path)
   end
 end
