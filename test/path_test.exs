@@ -19,21 +19,21 @@ defmodule MediaP.PathTest do
   end
 
   test "returns correct system path for original media" do
-    filename = "test.jpg"
+    request_path = "/test.jpg"
     flags = []
     system_dir = %{original: "/original", transformed: "/transformed"}
 
-    result = Path.get_system_path(filename, flags, system_dir)
+    result = Path.get_system_path(request_path, flags, system_dir)
 
     assert result == "/original/test.jpg"
   end
 
   test "returns correct system path for transformed media" do
-    filename = "test.jpg"
+    request_path = "/w_10,h_10/test.jpg"
     flags = [w: 10, h: 10]
     system_dir = %{original: "/original", transformed: "/transformed"}
 
-    result = Path.get_system_path(filename, flags, system_dir)
+    result = Path.get_system_path(request_path, flags, system_dir)
 
     assert result == "/transformed/w_10/h_10/test.jpg"
   end
