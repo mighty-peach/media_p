@@ -1,5 +1,6 @@
 defmodule MediaP.Path do
   @moduledoc false
+  alias MediaP.FilePath
 
   @doc """
   Returns extension of gived file
@@ -29,14 +30,21 @@ defmodule MediaP.Path do
     |> List.last()
   end
 
-  @doc """
-  Returns path for the giver filename according to config and flags value
+  def get_file_path(request_path, flags, system_dir) do
+    filename = get_filename(request_path)
+    extenstion = get_extension(request_path)
+    system_path = get_system_path(filename, flags, system_dir)
+    dir_name = get_dir_to_file(system_path, filename)
 
-  returns "/assets/transformed/w_10/test.jpg"
-  """
-  def get_system_path(requeset_path, flags, system_dir) do
-    filename = get_filename(requeset_path)
+    %FilePath{
+      filename: filename,
+      extension: extenstion,
+      system_path: system_path,
+      dir_name: dir_name
+    }
+  end
 
+  def get_system_path(filename, flags, system_dir) do
     case length(flags) == 0 do
       true ->
         "#{system_dir.original}/#{filename}"

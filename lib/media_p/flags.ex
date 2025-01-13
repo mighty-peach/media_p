@@ -1,6 +1,7 @@
 defmodule MediaP.Flags do
   @moduledoc false
 
+  @known_flags ["w", "h", "c", "dpr", "f", "b", "q"]
   @doc """
   returns list of tuples with flags
 
@@ -10,10 +11,10 @@ defmodule MediaP.Flags do
 
   return [w: 10, h: 10]
   """
-  def parse(request_path, known_flags, segments_before_flags \\ 0) do
+  def parse(request_path, segments_before_flags \\ 0) when is_binary(request_path) do
     request_path
     |> get_flags(segments_before_flags)
-    |> filter_flags(known_flags)
+    |> filter_flags(@known_flags)
     |> transform_flags()
     |> Enum.sort(:desc)
   end
@@ -85,7 +86,15 @@ defmodule MediaP.Flags do
   end
 
   defp get_flag("b", [head | tail], result) do
-    result = [{:b, "#{elem(head, 1)}_#{elem(head, 2)}"} | result]
+    result = [
+      {:b,
+       head
+       |> Tuple.delete_at(0)
+       |> Tuple.to_list()
+       |> Enum.join("_")}
+      | result
+    ]
+
     next = get_next_flag(tail)
 
     get_flag(next, tail, result)

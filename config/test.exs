@@ -9,7 +9,6 @@ config :media_p,
   test_path: "#{path}/assets/test",
   segments_before_flags: 0,
   origin: "media.com",
-  known_flags: ["w", "h"],
   req_options: [
     plug: {Req.Test, MediaP.Source}
   ]
