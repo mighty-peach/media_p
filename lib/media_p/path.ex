@@ -32,13 +32,11 @@ defmodule MediaP.Path do
   @doc """
   Returns path for the giver filename according to config and flags value
 
-  arg filename: String, "test.jpg"
-  arg flags: List, [w: 10]
-  arg config: %{ transformed: String, original: String }
-
   returns "/assets/transformed/w_10/test.jpg"
   """
-  def get_system_path(filename, flags, system_dir) do
+  def get_system_path(requeset_path, flags, system_dir) do
+    filename = get_filename(requeset_path)
+
     case length(flags) == 0 do
       true ->
         "#{system_dir.original}/#{filename}"

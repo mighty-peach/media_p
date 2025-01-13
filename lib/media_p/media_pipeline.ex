@@ -1,14 +1,17 @@
 defmodule MediaP.MediaPipeline do
   @moduledoc false
 
-  @doc """
-  handles media based on specified param in url
+  alias MediaP.ImagePipeline
 
-  arg request_path: String, `/path/to/file`
-  arg mode: :proxy | :in_place
-  """
+  def get_system_path(request_path) do
+    ImagePipeline.get_system_path(request_path)
+  end
 
-  def handle(request_path, mode) do
-    MediaP.ImagePipeline.handle(request_path, mode)
+  def handle_from_cache(file, system_path) do
+    ImagePipeline.wrap_cached(file, system_path)
+  end
+
+  def handle_new(system_path, request_path, mode) do
+    ImagePipeline.get_new(system_path, request_path, mode)
   end
 end
