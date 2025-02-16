@@ -2,8 +2,7 @@ defmodule MediaP.SourceTest do
   alias MediaP.Source
   use ExUnit.Case
 
-  @path Path.expand("./", __DIR__)
-  @test_image "#{@path}/assets/test/image.jpg"
+  @test_image Path.join([__DIR__, "assets", "test", "image.jpg"])
 
   test "converts flags in url into list of only known flags" do
     # Arrange

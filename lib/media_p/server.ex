@@ -1,8 +1,6 @@
 defmodule MediaP.Server do
   import Plug.Conn
 
-  # TODO: add :in_place mode
-
   def init(options) do
     options
   end
@@ -10,13 +8,8 @@ defmodule MediaP.Server do
   def call(conn, _opts) do
     request_path = conn.request_path
 
-    current = self()
-    spawn(fn -> MediaP.Handler.handle(current, request_path) end)
-
-    response =
-      receive do
-        {:ok, response} -> response
-      end
+    task = Task.async(fn -> MediaP.Handler.handle(request_path) end)
+    {:ok, response} = Task.await(task)
 
     conn
     |> put_resp_content_type(response.content_type)

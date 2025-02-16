@@ -5,8 +5,7 @@ defmodule MediaP.HandlerTest do
   use ExUnit.Case, async: true
   use Mimic
 
-  @path Path.expand("../", __DIR__)
-  @test_image "#{@path}/test/assets/test/image.jpg"
+  @test_image Path.join([__DIR__, "assets", "test", "image.jpg"])
   @systed_dir %{
     original: Application.compile_env!(:media_p, :original_path),
     transformed: Application.compile_env!(:media_p, :transformed_path)
@@ -17,7 +16,6 @@ defmodule MediaP.HandlerTest do
   test "Returns original image if it is in cache" do
     # Arrange
     file = File.read!(@test_image)
-    current = self()
     request_path = "/just/image.webp"
 
     File
@@ -25,12 +23,7 @@ defmodule MediaP.HandlerTest do
     |> stub(:open!, fn _ -> file end)
 
     # Act
-    spawn(fn -> Handler.handle(current, request_path) end)
-
-    response =
-      receive do
-        {:ok, response} -> response
-      end
+    {:ok, response} = Handler.handle(request_path)
 
     # Assert
     assert response.content_type == "image/webp"
@@ -39,7 +32,6 @@ defmodule MediaP.HandlerTest do
 
   test "Returns original image if there is no cache hit" do
     # Arrange
-    current = self()
     request_path = "/just/image.webp"
 
     File
@@ -51,12 +43,7 @@ defmodule MediaP.HandlerTest do
     |> expect(:download_image, fn _ -> :image end)
 
     # Act
-    spawn(fn -> Handler.handle(current, request_path) end)
-
-    response =
-      receive do
-        {:ok, response} -> response
-      end
+    {:ok, response} = Handler.handle(request_path)
 
     # Assert
     assert response.content_type == "image/webp"
@@ -66,7 +53,6 @@ defmodule MediaP.HandlerTest do
   test "Returns transformed image if it is in cache" do
     # Arrange
     file = File.read!(@test_image)
-    current = self()
     request_path = "/w_10,h_10/image.png"
 
     File
@@ -74,12 +60,7 @@ defmodule MediaP.HandlerTest do
     |> stub(:open!, fn _ -> file end)
 
     # Act
-    spawn(fn -> Handler.handle(current, request_path) end)
-
-    response =
-      receive do
-        {:ok, response} -> response
-      end
+    {:ok, response} = Handler.handle(request_path)
 
     # Assert
     assert response.content_type == "image/png"
@@ -88,7 +69,6 @@ defmodule MediaP.HandlerTest do
 
   test "Returns transformed image if there is no cache hit" do
     # Arrange
-    current = self()
     request_path = "/w_10,h_10/image.png"
 
     File
@@ -100,12 +80,7 @@ defmodule MediaP.HandlerTest do
     |> expect(:download_image, fn _ -> :image end)
 
     # Act
-    spawn(fn -> Handler.handle(current, request_path) end)
-
-    response =
-      receive do
-        {:ok, response} -> response
-      end
+    {:ok, response} = Handler.handle(request_path)
 
     # Assert
     assert response.content_type == "image/png"

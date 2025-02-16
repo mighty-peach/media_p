@@ -2,8 +2,8 @@ defmodule MediaP.MediaPipelineTest do
   alias MediaP.MediaPipeline
   use ExUnit.Case
 
-  @path Path.expand("../", __DIR__)
-  @test_image "#{@path}/test/assets/test/image.jpg"
+  @path Path.expand(__DIR__)
+  @test_image Path.join([__DIR__, "assets", "test", "image.jpg"])
 
   test "returns correct file path" do
     request_path = "/image/test.jpg"
@@ -11,10 +11,11 @@ defmodule MediaP.MediaPipelineTest do
     result = MediaPipeline.get_file_path(request_path)
 
     assert result == %MediaP.FilePath{
-             dir_name: "#{@path}/test/assets/original/",
+             dir_name: "#{@path}/assets/original/",
              extension: "jpg",
              filename: "test.jpg",
-             system_path: "#{@path}/test/assets/original/test.jpg"
+             system_path: "#{@path}/assets/original/test.jpg",
+             system_original_path: "#{@path}/assets/original/test.jpg"
            }
   end
 
@@ -36,7 +37,7 @@ defmodule MediaP.MediaPipelineTest do
     end)
 
     # Act
-    result = MediaPipeline.handle_new(request_path, :proxy)
+    result = MediaPipeline.handle_downloaded(request_path)
 
     # Assert
     assert result == %MediaP.Media{file: file, type: "image"}

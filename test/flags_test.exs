@@ -2,17 +2,6 @@ defmodule MediaP.FlagsTest do
   alias MediaP.Flags
   use ExUnit.Case
 
-  test "converts flags in url into list of only known flags" do
-    # Arrange
-    test_url = "/w_10,h_20,unknown_321/123.jpg"
-
-    # Act
-    result = Flags.parse(test_url)
-
-    # Assert
-    assert result == [w: 10, h: 20]
-  end
-
   test "parses all known flags correctly" do
     # Arrange
     test_url = "/w_10,h_20,b_auto:gradient_test,c_lpad,q_auto,f_auto,dpr_1.0/123.jpg"
@@ -22,13 +11,13 @@ defmodule MediaP.FlagsTest do
 
     # Assert
     assert result == [
-             {:w, 10},
-             {:q, "auto"},
-             {:h, 20},
-             {:f, "auto"},
-             {:drp, 1.0},
-             {:c, "lpad"},
-             {:b, "auto:gradient_test"}
+             "w_10",
+             "q_auto",
+             "h_20",
+             "f_auto",
+             "dpr_1.0",
+             "c_lpad",
+             "b_auto:gradient_test"
            ]
   end
 
@@ -40,7 +29,7 @@ defmodule MediaP.FlagsTest do
     result = Flags.parse(test_url, 1)
 
     # Assert
-    assert result == [w: 10]
+    assert result == ["w_10"]
   end
 
   test "does nothing if there are no flags in the url" do

@@ -11,7 +11,7 @@ defmodule MediaP.MediaPipeline do
     ImagePipeline.wrap_cached(file)
   end
 
-  def handle_new(request_path, mode) do
-    ImagePipeline.get_new(request_path, mode)
+  def handle_downloaded(request_path) do
+    ImagePipeline.get_new(request_path)
   end
 end

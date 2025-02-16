@@ -24,8 +24,6 @@ defmodule MediaP.MixProject do
   defp deps do
     [
       {:req, "~> 0.5.0"},
-      {:vix, "~> 0.31.1"},
-      {:image, "~> 0.55.2"},
       {:plug, "~> 1.0"},
       {:bandit, "~> 1.0"},
       {:mimic, "~> 1.10", only: :test}
