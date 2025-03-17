@@ -16,14 +16,6 @@ mix deps.get
 
 ## Configuration
 
-Create the following directories for media storage:
-
-```bash
-mkdir -p assets/transformed
-mkdir -p assets/original
-mkdir -p assets/test
-```
-
 Add the following configuration to your `config/config.exs`:
 
 ```elixir
@@ -48,6 +40,6 @@ The configuration options are:
 ## Roadmap
 
 - Improve error handling and logging
-- Simplify configuration
 - Storage management: delete old files
+- Make it work for video pipelines
 - Storage management: set size limits for total storage

@@ -4,6 +4,8 @@ defmodule MediaP do
 
   @impl true
   def start(_start_type, _start_args) do
+    MediaP.Setup.ensure_directories_exist()
+
     children = [
       {Bandit, plug: MediaP.Server, port: Application.get_env(:media_p, :port)}
     ]
